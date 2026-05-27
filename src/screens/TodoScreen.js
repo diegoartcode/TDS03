@@ -1,12 +1,47 @@
+import {useState} from 'react';
 import { TouchableOpacity, View, StyleSheet, FlatList, Text, TextInput } from "react-native";
 
 export default function TodoScreen({ navigation }) {
-    // lista fixa
-    const TaskList = [
+    // estado para armazenar o texto digitado no input
+    const [task, setTask] = useState('');
+
+     // lista fixa 
+    const [TaskList, setTaskList ] = useState([
         { id: '1', text: 'Estudar React Native', completed: false },
         { id: '2', text: 'Academia às 18h', completed: true },
         { id: '3', text: 'Ler um livro', completed: true }
-    ];
+    ]);
+
+    // Adicionar nova tarefa
+    const handleAddTask = () => {
+        console.log(task)
+
+        // remover espaços e verificar se o campo está vazio
+        if(task.trim() === '') return
+
+        // criar um novo objeto de tarefa
+        const newTask ={
+            // criar um ID único baseado na data atual
+            id: Date.now().toString(),
+            // Texto digitado pelo usuario
+            text: task,
+            // a tarefa inicia como não concluida
+            completed: false
+        }
+
+        // adicinar a nova tarefa no final da lista
+        setTaskList([...TaskList, newTask]);
+        
+
+        // limpa o campo de texto
+        setTask('');
+
+        
+
+    }
+
+   
+
     // função apenas visual para redenrizar cada item
     const renderTodoItem = ({item}) => (
         <View style={styles.taskContainer}>
@@ -22,12 +57,8 @@ export default function TodoScreen({ navigation }) {
 
                 </View>
 
-
-
-                <Text style={[styles.taskText, item.completed && styles.taskTextCompleted]}>
-                    
-                    {item.text}
-                    
+                <Text style={[styles.taskText, item.completed && styles.taskTextCompleted]}>                    
+                    {item.text}                    
                 </Text>
 
 
@@ -49,21 +80,34 @@ export default function TodoScreen({ navigation }) {
                 renderItem={renderTodoItem}
                 keyExtractor={item => item.id}
                 contentContainerStyle={styles.listContainer}
+                // componente exibe se a lista estiver vazia
+                ListEmptyComponent={
+                    <Text style={styles.emptyText}>
+                        Nenhuma tarefa por aqui. Aproveite o dia!
+                    </Text>
+                }
+
             />
 
             <View style={styles.inputContainer}>
-                <TextInput style={styles.input} placeholder="Nova Tarefa" placeholderTextColor='#999' />
-                <TouchableOpacity style={styles.addButton}>
+                <TextInput style={styles.input} placeholder="Nova Tarefa" placeholderTextColor='#999' 
+                // valor digitado
+                value={task}
+
+                //atualiza o estado ao digitar 
+                onChangeText={setTask}
+                 />
+
+
+                <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
                     <Text style={styles.addButtonText}>+</Text>
                 </TouchableOpacity>
+
+
             </View>
         </View>
     )
 }
-
-
-
-
 
 
 const styles = StyleSheet.create({
@@ -177,6 +221,12 @@ const styles = StyleSheet.create({
     taskTextCompleted:{
         textDecorationLine:'line-through',
         color:'#999'
+    },
+    emptyText:{
+        textAlign:'center',
+        color:'#6c727f',
+        marginTop:40,
+        fontSize:16
     }
 
 })
