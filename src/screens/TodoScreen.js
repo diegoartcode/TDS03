@@ -30,22 +30,47 @@ export default function TodoScreen({ navigation }) {
         }
 
         // adicinar a nova tarefa no final da lista
-        setTaskList([...TaskList, newTask]);
-        
+        setTaskList([...TaskList, newTask]);       
 
         // limpa o campo de texto
-        setTask('');
-
-        
+        setTask('');       
 
     }
+
+    // função para excluir tarefa
+    const handleDeleteTask = (id) =>{
+        console.log(id)
+
+        // filtrar todas as tarefas diferentes do ID informado
+        const filteredTask = TaskList.filter(item => item.id !== id)
+
+        // atualizar a lista 
+        setTaskList(filteredTask)
+    }
+
+    // funcao de completar tarefa
+
+    const toggleTaskStatus = (id) => {
+        const updatedTask = TaskList.map(item => 
+
+            item.id === id
+
+            ? {...item, completed: !item.completed}
+
+            : item
+        )
+
+        setTaskList(updatedTask)
+    }
+
+
 
    
 
     // função apenas visual para redenrizar cada item
     const renderTodoItem = ({item}) => (
         <View style={styles.taskContainer}>
-            <TouchableOpacity style={styles.taskTextContainer}>
+            <TouchableOpacity style={styles.taskTextContainer} onPress={() => toggleTaskStatus(item.id)}>
                 <View style={[
                     styles.circle,
                     item.completed && styles.circleCompleted
@@ -54,17 +79,16 @@ export default function TodoScreen({ navigation }) {
                     {item.completed && (
                     <Text style={styles.checkMark}>✓</Text>
                     )}
-
                 </View>
 
                 <Text style={[styles.taskText, item.completed && styles.taskTextCompleted]}>                    
-                    {item.text}                    
+                    {item.id} {item.text}                    
                 </Text>
 
 
 
             </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton}>
+            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteTask(item.id)}>
                 <Text style={styles.deleteButtonText}>X</Text>
             </TouchableOpacity>
         </View>
@@ -73,7 +97,8 @@ export default function TodoScreen({ navigation }) {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Text style={styles.title}>Minhas Tarefas</Text>
-                <Text style={styles.subtitle}>1 pendentes</Text>
+                <Text style={styles.subtitle}>
+                    {TaskList.filter(t=> !t.completed).length} pendentes</Text>
             </View>
             <FlatList
                 data={TaskList}
